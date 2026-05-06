@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Lesion AI</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+<style>
+body {
+    margin:0;
+    font-family:Segoe UI;
+    background:#f4f7fb;
+    color:#333;
+    transition:0.3s;
+}
+
+.dark {
+    background:#121212;
+    color:#fff;
+}
+
+/* NAV */
+nav {
+    background:#1a1a2e;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+}
+
+button {
+    padding:10px;
+    margin:5px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+/* CARD */
+.card {
+    background:#fff;
+    padding:15px;
+    border-radius:10px;
+    margin:10px;
+}
+
+.dark .card {
+    background:#1e1e1e;
+}
+
+/* LOGIN */
+#loginBox {
+    max-width:400px;
+    margin:20px auto;
+    text-align:center;
+}
+
+/* SECTIONS */
+section {
+    max-width:900px;
+    margin:20px auto;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <h3>AI Skin System</h3>
+    <button onclick="toggleDark()">🌙 Dark Mode</button>
+</nav>
+
+<!-- 🔐 LOGIN -->
+<div id="loginBox" class="card">
+    <h3>Patient Login</h3>
+    <input id="name" placeholder="Name"><br>
+    <input id="age" placeholder="Age"><br>
+    <input id="gender" placeholder="Gender"><br>
+    <button onclick="login()">Start</button>
+</div>
+
+<!-- MAIN -->
+<div id="mainApp" style="display:none; text-align:center;">
+
+    <input type="file" id="imageInput"><br>
+    <button onclick="analyzeImage()">Scan</button>
+
+    <p id="resultText">Waiting...</p>
+    <button onclick="generateReport()">📄 Report</button>
+
+</div>
+
+<!-- 📊 DASHBOARD -->
+<section>
+<h3>📊 Dashboard</h3>
+<canvas id="chart1"></canvas>
+</section>
+
+
+
+<section id="diseasePoints">
+    <h2 class="title">🩺 Important Skin Disease Awareness</h2>
+
+    <div class="points-container">
+
+        <div class="point-card">
+            <h3>1. Early Detection Saves Lives</h3>
+            <p>Skin cancer, especially melanoma, is highly treatable when detected early.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>2. ABCDE Rule</h3>
+            <p>Asymmetry, Border, Color, Diameter, and Evolving help identify dangerous moles.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>3. UV Radiation Risk</h3>
+            <p>Excess sun exposure is the leading cause of most skin cancers.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>4. Irregular Borders</h3>
+            <p>Moles with uneven or jagged edges can be a warning sign.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>5. Color Variation</h3>
+            <p>Multiple colors in one mole (brown, red, black) can indicate risk.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>6. Diameter Check</h3>
+            <p>Moles larger than 6mm should be checked by a doctor.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>7. Bleeding or Itching</h3>
+            <p>Any mole that bleeds, itches, or changes suddenly needs attention.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>8. Family History</h3>
+            <p>If skin cancer runs in your family, your risk increases.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>9. Use Sunscreen</h3>
+            <p>SPF 30+ sunscreen helps prevent UV damage and skin cancer.</p>
+        </div>
+
+        <div class="point-card">
+            <h3>10. Monthly Skin Check</h3>
+            <p>Regular self-examination helps detect abnormalities early.</p>
+        </div>
+
+    </div>
+</section>
+<section id="diseaseInfo">
+<h2 style="text-align:center; font-size:32px;">📚 Skin Disease Awareness</h2>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin-top:20px;">
+<!-- 1 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5"
+style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+<h3>1. Melanoma</h3>
+<p>Most dangerous type of skin cancer. Early detection is critical.</p>
+</div>
+
+<!-- 2 -->
+<div class="card">
+<img src="https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg"
+style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+<h3>2. Basal Cell Carcinoma</h3>
+<p>Common and slow-growing but requires treatment.</p>
+</div>
+
+
+
+<!-- 4 -->
+<div class="card">
+<img src="https://images.pexels.com/photos/5938402/pexels-photo-5938402.jpeg"
+style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+<h3>3. Actinic Keratosis</h3>
+<p>Precancerous lesion caused by sun damage.</p>
+</div>
+
+
+<!-- 6 -->
+<div class="card">
+<img src="https://images.pexels.com/photos/8460157/pexels-photo-8460157.jpeg"
+style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+<h3>4. Dermatofibroma</h3>
+<p>Firm bump, non-cancerous and harmless.</p>
+</div>
+
+
+
+<!-- 8 -->
+<div class="card">
+<img src="https://images.pexels.com/photos/6749777/pexels-photo-6749777.jpeg"
+style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+<h3>5. Rosacea</h3>
+<p>Chronic skin condition causing redness and irritation.</p>
+</div>
+
+<!-- 9 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1612277795421-9bc7706a4a34"
+style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+<h3>6. Psoriasis</h3>
+<p>Autoimmune disease causing scaly patches.</p>
+</div>
+
+<!-- 10 -->
+<div class="card">
+<img src="https://images.pexels.com/photos/7089629/pexels-photo-7089629.jpeg"
+style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+<h3>7. Eczema</h3>
+<p>Causes itchy, inflamed skin. Not contagious.</p>
+</div>
+<!-- REPORT -->
+<section>
+<div id="reportBox" class="card" style="display:none;"></div>
+</section>
+
+<script>
+let lastResult = null;
+
+/* 🔐 LOGIN */
+function login(){
+    const user={
+        name:document.getElementById("name").value,
+        age:document.getElementById("age").value,
+        gender:document.getElementById("gender").value
+    };
+    localStorage.setItem("patient",JSON.stringify(user));
+
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("mainApp").style.display="block";
+}
+
+/* 🌙 DARK MODE */
+function toggleDark(){
+    document.body.classList.toggle("dark");
+}
+
+/* 🤖 AI MODEL (TensorFlow demo) */
+async function runModel(){
+    const model=tf.sequential();
+    model.add(tf.layers.dense({units:1,inputShape:[1]}));
+    model.compile({loss:'meanSquaredError',optimizer:'sgd'});
+
+    const xs=tf.tensor([1,2,3,4]);
+    const ys=tf.tensor([1,3,5,7]);
+
+    await model.fit(xs,ys,{epochs:50});
+    return model.predict(tf.tensor([5])).dataSync()[0];
+}
+
+/* ANALYZE */
+async function analyzeImage(){
+    document.getElementById("resultText").innerHTML="Analyzing...";
+
+    const ai=await runModel();
+
+    const results=[
+        "Melanoma ⚠️",
+        "Benign ✅",
+        "Basal Cell ⚠️"
+    ];
+
+    const res=results[Math.floor(Math.random()*results.length)];
+    lastResult=res;
+
+    document.getElementById("resultText").innerHTML=
+        res + " (AI score: "+ai.toFixed(2)+")";
+}
+
+/* 📄 REPORT */
+function generateReport(){
+    const patient=JSON.parse(localStorage.getItem("patient"));
+
+    if(!patient || !lastResult){
+        alert("Login & Scan first");
+        return;
+    }
+
+    const html=`
+    <h3>Patient Report</h3>
+    <p>Name: ${patient.name}</p>
+    <p>Age: ${patient.age}</p>
+    <p>Gender: ${patient.gender}</p>
+    <hr>
+    <p>Result: ${lastResult}</p>
+    <p>Date: ${new Date().toLocaleString()}</p>
+    <button onclick="printReport()">Print</button>
+    `;
+
+    document.getElementById("reportBox").style.display="block";
+    document.getElementById("reportBox").innerHTML=html;
+}
+
+function printReport(){
+    const win=window.open("");
+    win.document.write(document.getElementById("reportBox").innerHTML);
+    win.print();
+}
+
+/* 📊 DASHBOARD CHART */
+new Chart(document.getElementById("chart1"),{
+    type:'line',
+    data:{
+        labels:["Jan","Feb","Mar","Apr"],
+        datasets:[{
+            label:"Cases",
+            data:[5,10,7,15]
+        }]
+    }
+});
+</script>
+
+</body>
+</html>
